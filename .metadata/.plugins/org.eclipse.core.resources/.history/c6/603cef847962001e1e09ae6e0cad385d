@@ -1,0 +1,8 @@
+server.port=8081
+spring.datasource.url=jdbc:sqlserver://localhost;databaseName=testdb;
+spring.datasource.username=sa
+spring.datasource.password=pratiksha
+spring.datasource.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
+#spring.jpa.properties.hibernate.dialect=org.hiberate.dialect.SQLServer2012Dialect
+spring.jpa.hiberate.ddl-auto = update
+spring.jpa.show-sql = true

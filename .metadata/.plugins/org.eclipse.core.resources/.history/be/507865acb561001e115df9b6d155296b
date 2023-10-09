@@ -1,0 +1,5 @@
+package com.training.springmvc1.controller;
+
+public class HomeController {
+
+}

@@ -1,0 +1,22 @@
+package com.training.spring;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class CarDemo {
+
+	
+		public static void main(String[] args) {
+			ApplicationContext context = new ClassPathXmlApplicationContext("ApplicationConfig.xml");
+			Car p1=(Car)context.getBean("car");
+			System.out.println(p1.getMake());
+			Car p2=(Car)context.getBean("car");
+			p2.setMake("Honda");
+			System.out.println(p1.getMake());
+		
+
+		
+
+	}
+
+}

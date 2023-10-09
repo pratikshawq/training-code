@@ -1,0 +1,32 @@
+package com.example.springboot.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.springboot.model.Student;
+
+@RestController
+@RequestMapping("/")
+public class HomeController {
+	@GetMapping
+	
+	public String getMessage() {
+		return "Hello from spring boot!";
+		
+	}
+	@GetMapping("student")
+	public List<Student> student(){
+		List<Student> studList = new ArrayList<>();
+		studList.add(new Student("Rahul","Patil",123,"A+"));
+		studList.add(new Student("Rohan","Verma",134,"B+"));
+		studList.add(new Student("Preeti","Patel",127,"A"));
+		studList.add(new Student("Sneha","Kale",136,"A+"));
+		studList.add(new Student("Pratik","Shinde",133,"A"));
+		return studList;
+	}
+
+}

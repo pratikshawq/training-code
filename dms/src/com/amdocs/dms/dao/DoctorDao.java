@@ -1,0 +1,181 @@
+package com.amdocs.dms.dao;
+
+import com.amdocs.dms.mode.Doctor;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class DoctorDao {
+    private Connection connection;
+
+    public DoctorDao() {
+        try {
+            // Initialize the database connection here (use DatabaseConnection class)
+            connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "scott", "tiger");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle the exception
+        }
+    }
+
+    public void addDoctor(Doctor doctor) {
+        String sql = "INSERT INTO doctors (doctorName, mobileNumber, specialization, availableShift, fees) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, doctor.getDoctorName());
+            preparedStatement.setString(2, doctor.getMobileNumber());
+            preparedStatement.setString(3, doctor.getSpecialization());
+            preparedStatement.setString(4, doctor.getAvailableShift());
+            preparedStatement.setDouble(5, doctor.getFees());
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Doctor added successfully.");
+            } else {
+                System.out.println("Failed to add doctor.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle the exception
+        }
+    }
+
+    public void updateDoctorFees(int doctorId, double newFees) 
+    {
+    	String sql = "UPDATE doctors SET fees = ? WHERE doctorId = ?";
+    	
+    	try 
+    	{	PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setDouble(1, newFees);
+            preparedStatement.setInt(2, doctorId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) 
+    	{
+            e.printStackTrace();
+            // Handle the exception
+        }
+    	
+        // the logic to update doctor fees 
+    }
+
+    public void deleteDoctor(int doctorId) 
+    {
+    	String sql = "DELETE FROM doctors WHERE doctorId = ?";
+    	try
+    	{
+    			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+    	
+            preparedStatement.setInt(1, doctorId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) 
+    	{
+            e.printStackTrace();
+            // Handle the exception
+        }
+        //  the logic to delete a doctor 
+    }
+
+    public List<Doctor> getAllDoctors() {
+        List<Doctor> doctors = new ArrayList<>();
+        String sql = "SELECT * FROM doctors";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                Doctor doctor = new Doctor();
+                doctor.setDoctorId(resultSet.getInt("doctorId"));
+                doctor.setDoctorName(resultSet.getString("doctorName"));
+                doctor.setMobileNumber(resultSet.getString("mobileNumber"));
+                doctor.setSpecialization(resultSet.getString("specialization"));
+                doctor.setAvailableShift(resultSet.getString("availableShift"));
+                doctor.setFees(resultSet.getDouble("fees"));
+                doctors.add(doctor);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle the exception
+        }
+        return doctors;
+    }
+
+    public List<Doctor> findDoctorsBySpecialization(String specialization) {
+        List<Doctor> doctorsBySpecialization = new ArrayList<>();
+        String sql = "SELECT * FROM doctors WHERE specialization = ?";
+        
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, specialization);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Doctor doctor = new Doctor();
+                    doctor.setDoctorId(resultSet.getInt("doctorId"));
+                    doctor.setDoctorName(resultSet.getString("doctorName"));
+                    doctor.setMobileNumber(resultSet.getString("mobileNumber"));
+                    doctor.setSpecialization(resultSet.getString("specialization"));
+                    doctor.setAvailableShift(resultSet.getString("availableShift"));
+                    doctor.setFees(resultSet.getDouble("fees"));
+                    doctorsBySpecialization.add(doctor);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle the exception
+        }
+        return doctorsBySpecialization;
+    }
+
+
+    public List<Doctor> findDoctorsWithFeesLessThanShift(String shift) {
+        List<Doctor> doctorsWithFeesLessThanShift = new ArrayList<>();
+        String sql = "SELECT * FROM doctors WHERE availableShift = ? AND fees < (SELECT MIN(fees) FROM doctors WHERE availableShift = ?)";
+        
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, shift);
+            preparedStatement.setString(2, shift);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Doctor doctor = new Doctor();
+                    doctor.setDoctorId(resultSet.getInt("doctorId"));
+                    doctor.setDoctorName(resultSet.getString("doctorName"));
+                    doctor.setMobileNumber(resultSet.getString("mobileNumber"));
+                    doctor.setSpecialization(resultSet.getString("specialization"));
+                    doctor.setAvailableShift(resultSet.getString("availableShift"));
+                    doctor.setFees(resultSet.getDouble("fees"));
+                    doctorsWithFeesLessThanShift.add(doctor);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle the exception
+        }
+        return doctorsWithFeesLessThanShift;
+    }
+
+
+    public int countDoctorsByShift(String shift) 
+    {
+    	String sql = "SELECT COUNT(*) FROM doctors WHERE shift = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, shift);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) 
+                {
+                    return resultSet.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle the exception
+        }
+        
+        // the logic to count the number
+        return 0;
+    }
+
+    public void closeConnection() {
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle the exception
+        }
+    }
+}
